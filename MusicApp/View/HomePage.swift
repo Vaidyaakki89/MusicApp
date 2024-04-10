@@ -18,6 +18,7 @@ struct HomePage:View {
     @State var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State var totalamount = 0.0
     @State  var downloadAmount = 0.0
+    @State var isrepeat = false
     
     var body: some View {
         
@@ -218,42 +219,44 @@ struct HomePage:View {
         
         
         if downloadAmount < totalamount {
-            downloadAmount = viewmodel.player.currentTime
-         //   let c = TimeInterval(downloadAmount)
-           
-           
-            if Int(downloadAmount) == Int(totalamount) - 1{
+            if Int(downloadAmount) != Int(viewmodel.player.currentTime){
+                downloadAmount = viewmodel.player.currentTime
+                //   let c = TimeInterval(downloadAmount)
                 
                 
-                
-                if viewmodel.selectedindex == viewmodel.selectedsonglist.count - 1{
+                if Int(downloadAmount) == Int(totalamount) - 1{
                     
-                   // viewmodel.player.stop()
-                    downloadAmount = 0
-                   // totalamount = 0
-                  
-                  
-                    viewmodel.buttonname = "pause"
-                    timer.upstream.connect().cancel()
-                }
-               // DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                    
+                    
+                    if viewmodel.selectedindex == viewmodel.selectedsonglist.count - 1{
+                        
+                        // viewmodel.player.stop()
+                        downloadAmount = 0
+                        // totalamount = 0
+                        
+                        
+                        viewmodel.buttonname = "pause"
+                        timer.upstream.connect().cancel()
+                    }
+                    //                if downloadAmount != 0{
                     rightSwipe()
-              //  }
+                    // }
+                }
             }
         }
         
     }
     
     func rightSwipe(){
-        print("index: \(viewmodel.selectedindex)")
-        
+        print("index: \(viewmodel.selectedindex) \(downloadAmount)")
+     
         if viewmodel.selectedindex < viewmodel.selectedsonglist.count - 1{
-            downloadAmount = 0
+          //  downloadAmount = 0
             viewmodel.selectedindex = viewmodel.selectedindex + 1
             viewmodel.selectedsong = viewmodel.selectedsonglist[viewmodel.selectedindex]
          
             viewmodel.setPlayer(audiourl: viewmodel.selectedsong?.url ?? ""){
-                downloadAmount = 0.0
+                downloadAmount = viewmodel.player.currentTime
                 totalamount = viewmodel.player.duration
                 timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
             }

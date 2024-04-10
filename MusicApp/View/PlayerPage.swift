@@ -225,8 +225,10 @@ struct PlayerPage:View {
             viewmodel.selectedsong = song
             
             viewmodel.setPlayer(audiourl: song?.url ?? ""){
-                downloadAmount = 0.0
+                downloadAmount = viewmodel.player.currentTime
                 totalamount = viewmodel.player.duration
+                let c = TimeInterval(downloadAmount)
+                starttime = c.stringFromTimeInterval()
                 endtime = viewmodel.player.duration.stringFromTimeInterval()
                 timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
             }
@@ -247,6 +249,7 @@ struct PlayerPage:View {
     
     func leftSwipe(){
         if viewmodel.selectedindex != 0{
+            timer.upstream.connect().cancel()
             downloadAmount = 0
             viewmodel.selectedindex = viewmodel.selectedindex - 1
             song = songlist[viewmodel.selectedindex]
@@ -259,8 +262,10 @@ struct PlayerPage:View {
     }
     
     func rightSwipe(){
+        print("index: \(viewmodel.selectedindex) \(downloadAmount)")
         
         if viewmodel.selectedindex < songlist.count - 1{
+            timer.upstream.connect().cancel()
             downloadAmount = 0
             viewmodel.selectedindex = viewmodel.selectedindex + 1
             song = songlist[viewmodel.selectedindex]
